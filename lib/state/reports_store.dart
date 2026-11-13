@@ -75,4 +75,12 @@ class ReportsScope extends InheritedNotifier<ReportsStore> {
     assert(scope != null, 'No ReportsScope found in context');
     return scope!.notifier!;
   }
+
+  /// Returns the store without subscribing to changes. Use it in callbacks
+  /// such as button handlers.
+  static ReportsStore read(BuildContext context) {
+    final scope = context.getInheritedWidgetOfExactType<ReportsScope>();
+    assert(scope != null, 'No ReportsScope found in context');
+    return scope!.notifier!;
+  }
 }

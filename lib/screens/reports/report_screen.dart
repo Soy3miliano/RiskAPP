@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riskapp/state/reports_store.dart';
 import 'package:riskapp/utils/constans/app_colors.dart';
 import 'package:riskapp/utils/constans/app_fonts.dart';
+import 'package:riskapp/widgets/app_back_button.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -44,7 +45,13 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   void _sendReport() {
-    // TODO: guardar el reporte en la base de datos
+    // Add the report to the shared store as Pending; Home shows it at once.
+    ReportsScope.read(context).add(
+      category: _category!,
+      title: _titleController.text.trim(),
+      location: _locationController.text.trim(),
+      description: _descriptionController.text.trim(),
+    );
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Report sent')));
     context.pop();
@@ -65,7 +72,7 @@ class _ReportScreenState extends State<ReportScreen> {
               // Encabezado
               Row(
                 children: [
-                  _backButton(),
+                  const AppBackButton(),
                   const SizedBox(width: 16),
                   Text(
                     'New report',
@@ -145,26 +152,6 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _backButton() {
-    return InkWell(
-      onTap: () => context.pop(),
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.borderColor),
-        ),
-        child: const Icon(
-          CupertinoIcons.chevron_back,
-          color: Colors.white,
-          size: 28,
         ),
       ),
     );
