@@ -32,12 +32,16 @@ class ReportDetailScreen extends StatelessWidget {
                 children: [
                   const AppBackButton(),
                   const SizedBox(width: 16),
-                  Text(
-                    'Report details',
-                    style: AppFonts.primary(
-                      fontSize: 26,
-                      fontWeight: AppColors.fontWeightMedium,
-                      color: Colors.white,
+                  Expanded(
+                    child: Text(
+                      'Report details',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.primary(
+                        fontSize: 26,
+                        fontWeight: AppColors.fontWeightMedium,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
