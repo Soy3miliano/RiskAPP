@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final Report report = visible[i];
                     return ReportCard(
                       report: report,
-                      onTap: () {},
+                      onTap: () => context.push('/detail/${report.id}'),
                       onToggleStatus: () => store.toggleStatus(report.id),
                     );
                   },
