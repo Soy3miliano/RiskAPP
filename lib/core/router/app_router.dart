@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:riskapp/screens/detail/report_detail_screen.dart';
 import 'package:riskapp/screens/reports/report_screen.dart';
 
 import '../../screens/home/home_screen.dart';
@@ -17,6 +18,13 @@ GoRouter createAppRouter() => GoRouter(
       path: '/report',
       name: 'report',
       builder: (context, state) => const ReportScreen(),
+    ),
+    GoRoute(
+      path: '/detail/:id',
+      name: 'detail',
+      builder: (context, state) => ReportDetailScreen(
+        reportId: int.tryParse(state.pathParameters['id'] ?? '') ?? -1,
+      ),
     ),
   ],
 );
