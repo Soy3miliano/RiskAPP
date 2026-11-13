@@ -1,22 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riskapp/models/report.dart';
+import 'package:riskapp/state/reports_store.dart';
 import 'package:riskapp/utils/constans/app_colors.dart';
-
-class Report {
-  Report({
-    required this.category,
-    required this.title,
-    required this.location,
-    required this.date,
-    this.resolved = false,
-  });
-
-  final String category;
-  final String title;
-  final String location;
-  final String date;
-  bool resolved;
-}
+import 'package:riskapp/widgets/report_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,44 +16,15 @@ class _HomeScreenState extends State<HomeScreen> {
   // 0 = All, 1 = Pending, 2 = Resolved
   int _filter = 0;
 
-  // Datos de prueba
-  final List<Report> _reports = [
-    Report(
-      category: 'ELECTRICITY',
-      title: 'Projector will not turn on',
-      location: 'Building A, room 112',
-      date: 'Nov 10',
-    ),
-    Report(
-      category: 'INTERNET AND NETWORKS',
-      title: 'Wi-Fi drops every few minutes',
-      location: 'Library, 2nd floor',
-      date: 'Nov 9',
-    ),
-    Report(
-      category: 'MAINTENANCE',
-      title: 'Leaking tap in restroom',
-      location: 'Science building, ground floor',
-      date: 'Nov 4',
-      resolved: true,
-    ),
-    Report(
-      category: 'FURNITURE',
-      title: 'Broken chair in lecture hall',
-      location: 'Hall 3, back row',
-      date: 'Oct 28',
-      resolved: true,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final pending = _reports.where((r) => !r.resolved).length;
-    final resolved = _reports.where((r) => r.resolved).length;
+    // Rebuilds automatically when the shared store changes.
+    final store = ReportsScope.of(context);
+    final reports = store.reports;
 
-    final visible = _reports.where((r) {
-      if (_filter == 1) return !r.resolved;
-      if (_filter == 2) return r.resolved;
+    final visible = reports.where((r) {
+      if (_filter == 1) return !r.isResolved;
+      if (_filter == 2) return r.isResolved;
       return true;
     }).toList();
 
@@ -95,9 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // Filtros
               Row(
                 children: [
-                  _filterTab('All', _reports.length, 0),
-                  _filterTab('Pending', pending, 1),
-                  _filterTab('Resolved', resolved, 2),
+                  _filterTab('All', reports.length, 0),
+                  _filterTab('Pending', store.pendingCount, 1),
+                  _filterTab('Resolved', store.resolvedCount, 2),
                 ],
               ),
               const SizedBox(height: 16),
@@ -107,7 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.separated(
                   itemCount: visible.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, i) => _reportCard(visible[i]),
+                  itemBuilder: (context, i) {
+                    final Report report = visible[i];
+                    return ReportCard(
+                      report: report,
+                      onTap: () => context.push('/detail/${report.id}'),
+                      onToggleStatus: () => store.toggleStatus(report.id),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 16),
@@ -160,87 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
               fontSize: 15,
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _reportCard(Report report) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                report.category,
-                style: const TextStyle(
-                  color: AppColors.backgroundColor,
-                  fontSize: 12,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              _statusChip(report.resolved),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            report.title,
-            style: const TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${report.location} · ${report.date}',
-                  style: const TextStyle(color: AppColors.textMuted),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              TextButton(
-                onPressed: () =>
-                    setState(() => report.resolved = !report.resolved),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.backgroundColor,
-                ),
-                child: Text(
-                  report.resolved ? 'Reopen' : 'Mark resolved',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: AppColors.fontWeightMedium,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _statusChip(bool resolved) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: resolved ? AppColors.borderColor : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: resolved ? AppColors.borderColor : AppColors.backgroundColor,
-        ),
-      ),
-      child: Text(
-        resolved ? 'Resolved' : 'Pending',
-        style: TextStyle(
-          color: resolved ? Colors.white : AppColors.backgroundColor,
-          fontSize: 13,
         ),
       ),
     );
