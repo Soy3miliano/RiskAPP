@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:riskapp/utils/constans/app_colors.dart';
 
 class Report {
@@ -116,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 height: 56,
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () => context.push('/report'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.backgroundColor,
                     side: const BorderSide(color: AppColors.backgroundColor),
