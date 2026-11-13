@@ -3,7 +3,9 @@ import 'package:riskapp/screens/reports/report_screen.dart';
 
 import '../../screens/home/home_screen.dart';
 
-final GoRouter appRouter = GoRouter(
+/// Builds the app router. A new instance is created per app so that each
+/// widget test starts on the Home screen.
+GoRouter createAppRouter() => GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
